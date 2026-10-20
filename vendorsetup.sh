@@ -1,10 +1,3 @@
-#
-# Copyright (C) 2026 The Android Open Source Project
-# Copyright (C) 2026 SebaUbuntu's TWRP device tree generator
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
-add_lunch_combo omni_Infinix-X6515-user
-add_lunch_combo omni_Infinix-X6515-userdebug
-add_lunch_combo omni_Infinix-X6515-eng
+# Product lunch targets are declared in AndroidProducts.mk via COMMON_LUNCH_CHOICES.
+# Do not use the obsolete add_lunch_combo helper on Android 12.1.
+:
