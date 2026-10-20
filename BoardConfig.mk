@@ -94,6 +94,7 @@ BOARD_AVB_ENABLE := true
 
 # TWRP Configuration
 TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_FBE_METADATA_DECRYPT := true
 TW_THEME := portrait_hdpi
 # MTK LED-class backlight from stock kernel; 0-255 is driver-derived.
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
