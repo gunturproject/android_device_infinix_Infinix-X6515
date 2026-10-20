@@ -1,21 +1,15 @@
-# Android device tree for Infinix Infinix X6515 (Infinix-X6515)
+# Device tree OrangeFox 12.1 for Infinix X6515
 
-```
-#
-# Copyright (C) 2026 The Android Open Source Project
-# Copyright (C) 2026 SebaUbuntu's TWRP device tree generator
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-```
+## Firmware target
 
+This tree is aligned to the user-supplied Infinix X6515 XOS stock boot image. The ramdisk reports model `Infinix X6515`, Android 12, fingerprint `Infinix/X6515-OP/Infinix-X6515:12/SP1A.210812.016/241204V944:user/release-keys`, build description `vnd_x6515_h6127-user 12 SP1A.210812.016 764070 release-keys`, build incremental `241204V944`, and security patch `2024-12-05`.
 
-## Recovery notes for stock XOS Android 12
+`prebuilt/kernel` and `prebuilt/dtb.img` are the kernel and DTB components extracted from that stock `boot.img`. The build workflow checks their SHA-256 values so a different prebuilt cannot silently replace them. Kernel base, page size, ramdisk offset, tags offset, and boot header version are set from the supplied stock boot image. The stock kernel advertises GZIP initramfs support; LZMA/LZ4 ramdisk compression is intentionally not enabled.
 
-This tree was audited against the uploaded X6515 stock `boot.img` ramdisk. The image reports fingerprint `Infinix/X6515-OP/Infinix-X6515:12/SP1A.210812.016/241204V944:user/release-keys` and its stock recovery fstab specifies F2FS for `/data`, `inlinecrypt`, `fileencryption=aes-256-xts:aes-256-cts:v2`, and `keydirectory=/metadata/vold/metadata_encryption`. The device-tree `/data` fstab entry and crypto build option are aligned to those values. This is configuration-level alignment only: it does not prove OrangeFox can decrypt this firmware. Verify decryption on the target device with the exact XOS build, and verify keymaster/vendor dependencies, formatting, backup/restore, and reboot paths before flashing.
+## Storage and partitions
 
+The stock recovery fstab declares `/data` as F2FS with `inlinecrypt`, `fileencryption=aes-256-xts:aes-256-cts:v2`, and `keydirectory=/metadata/vold/metadata_encryption`. The recovery fstab retains those values and exposes `formattable` as in stock. `/metadata` uses `/dev/block/by-name/md_udc`, matching the stock fstab. Scatter data places `boot_a` and `boot_b` at `0x2000000` bytes each, declares a shared `super` of `0x190c28000`, and confirms A/B boot, vendor_boot, dtbo, and vbmeta partitions. The recovery is built as recovery-as-boot in `boot.img`; the 32 MiB boot size is a hard limit and is not increased.
 
-The supplied `Download2.tar` scatter declares `super` size `0x190c28000` (6,723,633,152 bytes), while the original generated tree used 9,126,805,504 bytes. `BoardConfig.mk` now uses the stock SUPER capacity and a dynamic group 4 MiB smaller (preserving 4 MiB headroom, consistent with the original tree margin), rather than the oversized generated constants. The scatter shows A/B `boot`, `vendor_boot`, `dtbo`, and `vbmeta` families, plus a shared `super` and `userdata`. `vbmeta`, `vbmeta_system`, and `vbmeta_vendor` are AVB0 images with flags 0 and rollback index 2 in the supplied files. These values were inspected only; no bootloader, TEE, key, or verified-boot firmware images were modified or substituted.
+## Verification limits
 
-
-OrangeFox 12.1 uses the TWRP common product config at `vendor/twrp/config/common.mk`; the product/lunch identifier is `twrp_Infinix_X6515`, while the device directory and `PRODUCT_DEVICE` remain `Infinix-X6515`. This X6515 tree is configured as recovery-as-boot, so the recovery ramdisk is built into `boot.img`; it does not produce a separate recovery partition image. The exact output and device boot behavior still require validation on matching hardware.
+This is configuration alignment, not proof that OrangeFox boots or can decrypt the exact XOS installation. The supplied files do not include the matching vendor/system images or keymaster implementation, so crypto dependencies cannot yet be verified. Physical-device testing is still required for first boot, touch/display, USB/ADB/MTP, mount and format behavior, decryption, backup/restore, flashing, and reboot/slot handling. Do not flash an image unless it is verified to fit the stock boot partition and you have a tested stock restore path.
