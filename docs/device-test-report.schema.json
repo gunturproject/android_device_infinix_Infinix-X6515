@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "device-test-report.schema.json",
+  "title": "OrangeFox X6515 Physical Device Test Report",
+  "type": "object",
+  "required": ["schema_version", "device", "stock_firmware", "image_sha256", "started_at", "completed_at", "tests"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "device": {
+      "type": "object",
+      "required": ["model", "board", "fingerprint"],
+      "properties": {
+        "model": {"const": "Infinix X6515"},
+        "board": {"const": "mt6761"},
+        "fingerprint": {"const": "Infinix/X6515-OP/Infinix-X6515:12/SP1A.210812.016/241204V944:user/release-keys"}
+      },
+      "additionalProperties": true
+    },
+    "stock_firmware": {
+      "type": "object",
+      "required": ["boot_sha256"],
+      "properties": {
+        "boot_sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"}
+      },
+      "additionalProperties": true
+    },
+    "image_sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "tests": {
+      "type": "object",
+      "required": [
+        "boot_and_recovery_startup",
+        "display_touch_brightness",
+        "usb_adb_mtp_otg",
+        "storage_and_dynamic_partitions",
+        "fbe_keymaster_tee",
+        "backup_restore_sideload",
+        "slots_avb_and_reboot",
+        "ui_performance_and_locales",
+        "init_services_and_logs",
+        "crash_free_stress"
+      ],
+      "properties": {
+        "boot_and_recovery_startup": {"$ref": "#/$defs/featureTest"},
+        "display_touch_brightness": {"$ref": "#/$defs/featureTest"},
+        "usb_adb_mtp_otg": {"$ref": "#/$defs/featureTest"},
+        "storage_and_dynamic_partitions": {"$ref": "#/$defs/featureTest"},
+        "fbe_keymaster_tee": {"$ref": "#/$defs/featureTest"},
+        "backup_restore_sideload": {"$ref": "#/$defs/featureTest"},
+        "slots_avb_and_reboot": {"$ref": "#/$defs/featureTest"},
+        "ui_performance_and_locales": {"$ref": "#/$defs/featureTest"},
+        "init_services_and_logs": {"$ref": "#/$defs/featureTest"},
+        "crash_free_stress": {"$ref": "#/$defs/featureTest"}
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "featureTest": {
+      "type": "object",
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {"enum": ["PASS", "FAIL", "BLOCKED", "NOT_RUN"]},
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["test_id", "path", "sha256"],
+            "properties": {
+              "test_id": {"type": "string", "minLength": 1},
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+              "notes": {"type": "string"}
+            },
+            "additionalProperties": true
+          }
+        },
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

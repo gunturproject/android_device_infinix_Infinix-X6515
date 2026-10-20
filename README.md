@@ -26,6 +26,12 @@ The checker compares the boot header, stock partition sizes, kernel/DTB bytes, b
 
 `BOARD_SUPER_PARTITION_SIZE` reflects the physical capacity reported by scatter only. Logical partition group sizes and extents must be verified with an intact `super.img` using `lpdump`; scatter capacity alone is not proof of `/system`, `/vendor`, `/product`, or `/data` behavior. `super_empty.img` is not a substitute for the production super image.
 
+## Strict validation gates
+
+Run `python3 -m unittest discover -s tests -v` for parser and regression tests. `python3 tools/strict_x6515_validator.py --mode tree --device-tree .` checks the reviewed source configuration; add `--mode image --image /path/to/boot.img` to inspect a built candidate's header, component ranges, pinned kernel/DTB, gzip/newc ramdisk, init files, and required executables. Candidate checks are not runtime certification.
+
+The fail-closed release command, feature test matrix, safe evidence requirements, and report schema are in [`docs/STRICT-VALIDATION.md`](docs/STRICT-VALIDATION.md) and [`docs/device-test-report.schema.json`](docs/device-test-report.schema.json). Release mode additionally requires intact extracted firmware, `super.img`/`lpdump`, a non-empty audited proprietary manifest, and a fully passing hash-linked physical-device report. Missing evidence or a single non-PASS feature fails certification; no “100% compatible” claim is made from static checks alone.
+
 ## Proprietary components and encryption
 
 This tree currently has no audited `proprietary-files.txt` and no packaged vendor/Keymaster/TEE blobs. `extract-files.sh` therefore fails early with an explanatory error rather than producing an apparently successful empty vendor tree. The fstab crypto flags and `TW_INCLUDE_CRYPTO`/`TW_INCLUDE_FBE_METADATA_DECRYPT` options are configuration only. FBE decryption is **not verified** until matching firmware blobs/services are supplied and tested on the exact XOS build. Do not claim encrypted `/data` support from a successful compile or matching fstab alone.

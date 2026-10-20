@@ -62,7 +62,8 @@ def parse_boot_image(path: Path) -> dict[str, int | str]:
     tags_addr = struct.unpack_from("<I", data, 32)[0]
     page_size = struct.unpack_from("<I", data, 36)[0]
     header_version = struct.unpack_from("<I", data, 40)[0]
-    recovery_dtbo_size, recovery_dtbo_offset = struct.unpack_from("<II", data, 1632)
+    recovery_dtbo_size = struct.unpack_from("<I", data, 1632)[0]
+    recovery_dtbo_offset = struct.unpack_from("<Q", data, 1636)[0]
     header_size = struct.unpack_from("<I", data, 1644)[0]
     dtb_size = struct.unpack_from("<I", data, 1648)[0]
     dtb_addr = struct.unpack_from("<Q", data, 1652)[0]
